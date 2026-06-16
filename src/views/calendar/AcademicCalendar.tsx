@@ -1,131 +1,201 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { 
-  Plus, 
-  ChevronLeft, 
-  ChevronRight, 
-  Settings, 
-  AlertTriangle 
-} from 'lucide-react';
+import { Calendar as CalendarIcon, Plus, Trash2, ChevronLeft, ChevronRight, Info } from 'lucide-react';
 
-interface AcademicCalendarProps {
-  userRole: string;
+interface Evento {
+  id: number;
+  titulo: string;
+  fecha: string;
+  tipo: 'Feriado' | 'Examen' | 'Evento' | 'Institucional';
+  descripcion: string;
 }
 
-export const AcademicCalendar: React.FC<AcademicCalendarProps> = ({ userRole }) => {
-  const days = Array.from({ length: 30 }).map((_, i) => i + 1);
-  const events = [
-    { day: 2, title: 'Teacher Planning', type: 'admin' },
-    { day: 9, title: 'Bimester 1 Start', type: 'academic' },
-    { day: 16, title: 'Independence Day', type: 'holiday' },
-  ];
+export const AcademicCalendar: React.FC<{ userRole: string }> = ({ userRole }) => {
+  const [eventos, setEventos] = useState<Evento[]>([]);
+  const [viewDate, setViewDate] = useState(new Date());
+  const [showModal, setShowModal] = useState(false);
+  const [nuevoEvento, setNuevoEvento] = useState({ titulo: '', fecha: '', tipo: 'Evento', descripcion: '' });
+  const isAdmin = userRole === 'Secretario/a';
+
+  // Lógica para la grilla
+  const daysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate();
+  const firstDayOfMonth = (y: number, m: number) => {
+    const day = new Date(y, m, 1).getDay();
+    return day === 0 ? 6 : day - 1; // Ajuste para que empiece en Lunes
+  };
+
+  const year = viewDate.getFullYear();
+  const month = viewDate.getMonth();
+  const monthName = viewDate.toLocaleString('es', { month: 'long' });
+
+  const fetchEventos = async () => {
+    const res = await fetch('/api/admin/eventos', {
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    if (res.ok) setEventos(await res.json());
+  };
+
+  useEffect(() => { fetchEventos(); }, []);
+
+  const handleSave = async () => {
+    const res = await fetch('/api/admin/eventos', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('token')}` },
+      body: JSON.stringify(nuevoEvento)
+    });
+    if (res.ok) { fetchEventos(); setShowModal(false); }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('¿Eliminar este evento?')) return;
+    const res = await fetch(`/api/admin/eventos/${id}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('token')}` }
+    });
+    if (res.ok) fetchEventos();
+  };
 
   return (
-    <motion.div 
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      className="p-8 ml-64"
-    >
-      <div className="max-w-[1440px] mx-auto space-y-8">
+    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="p-8 ml-64">
+      <div className="max-w-4xl mx-auto space-y-6">
         <div className="flex justify-between items-end">
           <div>
-            <h1 className="text-3xl font-black text-brand-navy tracking-tight">Academic Calendar</h1>
-            <p className="text-slate-500 font-medium">Configure school year periods, holidays, and academic milestones.</p>
+            <h2 className="text-3xl font-black text-brand-navy capitalize">{monthName} {year}</h2>
+            <p className="text-slate-500 font-medium">Gestión de fechas institucionales.</p>
           </div>
-          {userRole === 'Secretario' && (
-            <div className="flex gap-3">
-              <button className="bg-brand-navy text-white px-4 py-2 rounded-xl font-bold flex items-center gap-2 hover:opacity-90 transition-all shadow-md active:scale-95 text-sm">
-                <Plus size={16} /> New Event
+          <div className="flex items-center gap-3">
+            <div className="flex bg-white border border-slate-200 rounded-xl p-1 shadow-sm">
+              <button onClick={() => setViewDate(new Date(year, month - 1))} className="p-2 hover:bg-slate-50 rounded-lg text-slate-600 transition-colors">
+                <ChevronLeft size={20} />
+              </button>
+              <button onClick={() => setViewDate(new Date())} className="px-4 text-xs font-bold text-brand-navy uppercase tracking-widest">
+                {monthName}
+              </button>
+              <button onClick={() => setViewDate(new Date(year, month + 1))} className="p-2 hover:bg-slate-50 rounded-lg text-slate-600 transition-colors">
+                <ChevronRight size={20} />
               </button>
             </div>
-          )}
+            {isAdmin && (
+              <button 
+                onClick={() => setShowModal(true)}
+                className="bg-brand-navy text-white px-5 py-2.5 rounded-xl font-bold flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-brand-navy/10"
+              >
+                <Plus size={18} /> Nuevo
+              </button>
+            )}
+          </div>
         </div>
 
-        <div className="grid grid-cols-12 gap-6">
-          <div className="col-span-12 xl:col-span-8 bg-white border border-slate-200 rounded-3xl shadow-sm overflow-hidden flex flex-col">
-            <div className="p-6 border-b border-slate-100 flex items-center justify-between">
-              <h3 className="text-xl font-bold text-brand-navy">September 2024</h3>
-              <div className="flex items-center gap-2">
-                <button className="p-2 hover:bg-slate-50 rounded-lg border border-slate-200 transition-all"><ChevronLeft size={18} /></button>
-                <button className="px-4 py-2 hover:bg-slate-50 rounded-lg border border-slate-200 text-sm font-bold transition-all">Today</button>
-                <button className="p-2 hover:bg-slate-50 rounded-lg border border-slate-200 transition-all"><ChevronRight size={18} /></button>
+        {/* Grilla de Calendario */}
+        <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+          <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/50">
+            {['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom'].map(d => (
+              <div key={d} className="py-4 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                {d}
               </div>
-            </div>
+            ))}
+          </div>
+          <div className="grid grid-cols-7">
+            {/* Celdas vacías al inicio */}
+            {Array.from({ length: firstDayOfMonth(year, month) }).map((_, i) => (
+              <div key={`empty-${i}`} className="h-32 border-b border-r border-slate-50 bg-slate-50/30"></div>
+            ))}
+            
+            {/* Días del mes */}
+            {Array.from({ length: daysInMonth(year, month) }).map((_, i) => {
+              const day = i + 1;
+              const isToday = new Date().toDateString() === new Date(year, month, day).toDateString();
+              const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+              const dayEvents = eventos.filter(e => e.fecha.startsWith(dateStr));
 
-            <div className="grid grid-cols-7 border-b border-slate-100 bg-slate-50/50">
-              {['SUN', 'MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT'].map(day => (
-                <div key={day} className="py-3 text-center text-[10px] font-black text-slate-400 uppercase tracking-widest">{day}</div>
-              ))}
-            </div>
-
-            <div className="grid grid-cols-7 flex-grow min-h-[600px]">
-              {Array.from({ length: 6 }).map((_, i) => <div key={i} className="border-r border-b border-slate-50 bg-slate-50/30" />)}
-              {days.map(d => {
-                const dayEvents = events.filter(e => e.day === d);
-                return (
-                  <div key={d} className="border-r border-b border-slate-50 p-3 hover:bg-slate-50/50 transition-all cursor-pointer flex flex-col gap-1 min-h-[100px]">
-                    <span className="text-xs font-bold text-slate-900">{d}</span>
-                    {dayEvents.map((e, idx) => (
-                      <div key={idx} className={`text-[9px] font-black uppercase px-2 py-1 rounded border overflow-hidden truncate leading-none ${
-                        e.type === 'academic' ? 'bg-brand-navy text-white border-brand-navy' :
-                        e.type === 'admin' ? 'bg-blue-50 text-blue-700 border-blue-100' :
-                        'bg-rose-50 text-rose-700 border-rose-100'
-                      }`}>
-                        {e.title}
+              return (
+                <div 
+                  key={day} 
+                  className={`h-32 border-b border-r border-slate-100 p-2 relative group transition-colors hover:bg-slate-50/50 ${isToday ? 'bg-blue-50/30' : ''}`}
+                >
+                  <span className={`text-xs font-bold ${isToday ? 'bg-brand-navy text-white w-6 h-6 flex items-center justify-center rounded-full' : 'text-slate-400'}`}>
+                    {day}
+                  </span>
+                  
+                  <div className="mt-1 space-y-1 overflow-y-auto max-h-[80px] scrollbar-hide">
+                    {dayEvents.map(e => (
+                      <div 
+                        key={e.id}
+                        title={e.descripcion}
+                        className={`text-[9px] px-1.5 py-1 rounded-lg font-bold truncate flex items-center justify-between group/item ${
+                          e.tipo === 'Feriado' ? 'bg-rose-100 text-rose-700' :
+                          e.tipo === 'Examen' ? 'bg-amber-100 text-amber-700' :
+                          e.tipo === 'Institucional' ? 'bg-slate-100 text-slate-700' :
+                          'bg-blue-100 text-blue-700'
+                        }`}
+                      >
+                        <span className="truncate">{e.titulo}</span>
+                        {isAdmin && (
+                          <button 
+                            onClick={(evt) => { evt.stopPropagation(); handleDelete(e.id); }}
+                            className="hidden group-hover/item:block ml-1 text-rose-900"
+                          >
+                            ×
+                          </button>
+                        )}
                       </div>
                     ))}
                   </div>
-                );
-              })}
-            </div>
+                </div>
+              );
+            })}
           </div>
+        </div>
 
-          <div className="col-span-12 xl:col-span-4 space-y-6">
-            <div className="bg-white border border-slate-200 rounded-3xl p-8 shadow-sm">
-              <div className="flex justify-between items-center mb-6">
-                <h3 className="text-lg font-bold text-brand-navy">Academic Bimesters</h3>
-                {userRole === 'Secretario' && (
-                  <button className="text-slate-400 hover:text-brand-navy transition-colors"><Settings size={18} /></button>
-                )}
+        {/* Leyenda */}
+        <div className="flex gap-6 justify-center">
+          {[
+            { label: 'Feriado', color: 'bg-rose-400' },
+            { label: 'Examen', color: 'bg-amber-400' },
+            { label: 'Evento', color: 'bg-blue-400' },
+            { label: 'Institucional', color: 'bg-slate-400' },
+          ].map(l => (
+            <div key={l.label} className="flex items-center gap-2">
+              <div className={`w-2 h-2 rounded-full ${l.color}`}></div>
+              <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">{l.label}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+
+      {showModal && (
+        <div className="fixed inset-0 z-[60] flex items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4">
+          <div className="bg-white w-full max-w-md rounded-3xl p-8 shadow-2xl">
+            <h3 className="text-xl font-bold text-brand-navy mb-6">Programar Nuevo Evento</h3>
+            <div className="space-y-4">
+              <div>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Título</label>
+                <input type="text" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-navy/10" value={nuevoEvento.titulo} onChange={e => setNuevoEvento({...nuevoEvento, titulo: e.target.value})} />
               </div>
-              <div className="space-y-4">
-                {[
-                  { name: 'First Bimester', range: 'Sept 9 - Nov 15', current: true },
-                  { name: 'Second Bimester', range: 'Nov 18 - Jan 31', current: false },
-                  { name: 'Third Bimester', range: 'Feb 3 - Apr 12', current: false },
-                  { name: 'Fourth Bimester', range: 'Apr 15 - Jun 28', current: false },
-                ].map((bim, i) => (
-                  <div key={i} className={`p-4 rounded-2xl border-l-4 transition-all hover:bg-slate-50 cursor-pointer ${bim.current ? 'bg-slate-50 border-brand-navy' : 'border-slate-200 hover:border-slate-300'}`}>
-                    <div className="flex justify-between items-center mb-1">
-                      <p className="text-sm font-bold text-slate-900">{bim.name}</p>
-                      {bim.current && <span className="bg-brand-navy text-white text-[9px] font-black uppercase px-2 py-0.5 rounded tracking-widest shadow-sm">Current</span>}
-                    </div>
-                    <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">{bim.range}</p>
-                  </div>
-                ))}
-                <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-2xl text-slate-300 font-black text-[10px] uppercase tracking-widest hover:border-slate-300 hover:text-slate-500 transition-all">
-                  + Add Bimester
-                </button>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Fecha</label>
+                  <input type="date" className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-navy/10" value={nuevoEvento.fecha} onChange={e => setNuevoEvento({...nuevoEvento, fecha: e.target.value})} />
+                </div>
+                <div>
+                  <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Tipo</label>
+                  <select className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-navy/10" value={nuevoEvento.tipo} onChange={e => setNuevoEvento({...nuevoEvento, tipo: e.target.value as any})}>
+                    <option>Evento</option><option>Feriado</option><option>Examen</option><option>Institucional</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-black text-slate-400 uppercase tracking-widest mb-1 block">Descripción</label>
+                <textarea className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-brand-navy/10 h-24" value={nuevoEvento.descripcion} onChange={e => setNuevoEvento({...nuevoEvento, descripcion: e.target.value})}></textarea>
               </div>
             </div>
-
-            <div className="bg-rose-50 border border-rose-100 rounded-3xl p-6 relative overflow-hidden group">
-               <div className="absolute -right-4 -top-4 opacity-5 group-hover:rotate-12 transition-transform">
-                 <AlertTriangle size={120} />
-               </div>
-               <div className="relative z-10 flex gap-4">
-                 <div className="w-10 h-10 bg-brand-error text-white rounded-xl flex items-center justify-center shrink-0 shadow-lg shadow-rose-200 animate-pulse">
-                   <AlertTriangle size={20} />
-                 </div>
-                 <div>
-                   <h3 className="text-sm font-bold text-brand-error uppercase tracking-tight">Holiday Conflict</h3>
-                   <p className="text-xs text-rose-800/80 font-medium leading-relaxed mt-1">Sept 16 overlaps with the scheduled Bimester 1 Welcome Assembly. System suggests rescheduling the opening event.</p>
-                 </div>
-               </div>
+            <div className="flex gap-3 mt-8">
+              <button onClick={() => setShowModal(false)} className="flex-grow py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">Cancelar</button>
+              <button onClick={handleSave} className="flex-grow py-3 rounded-xl font-bold bg-brand-navy text-white shadow-lg shadow-brand-navy/20">Guardar Evento</button>
             </div>
           </div>
         </div>
-      </div>
+      )}
     </motion.div>
   );
 };

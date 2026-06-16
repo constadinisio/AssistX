@@ -7,7 +7,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     if (!token) return res.status(403).json({ message: 'Acceso denegado. No hay token.' });
 
     try {
-        const verified = jwt.verify(token, process.env.JWT_SECRET || 'secret_key');
+        const verified = jwt.verify(token, process.env.JWT_SECRET as string);
         (req as any).user = verified;
         next();
     } catch (error) {
@@ -18,7 +18,7 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
 // Middleware para restringir por rol (ej. solo puede crear alumnos)
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
-    if (user.rol !== 'Secretario') {
+    if (user.rol !== 'Secretario/a') {
         return res.status(403).json({ message: 'Requiere rol de Secretario.' });
     }
     next();
