@@ -17,7 +17,7 @@ Existe un andamiaje a medio cablear que **no funciona punta a punta**:
 
 - `src/components/layout/RiskNotificationModal.tsx` — modal solo visual. Botón **"Enviar Aviso" sin `onClick`** (muerto). "Ver Detalles" navega a `history`.
 - `src/views/dashboard/Dashboard.tsx` — estado `isRiskModalOpen` (arranca `false` y **nunca pasa a `true`** → el modal no abre), `riskStudents` (fetch a `/api/admin/riesgo`), `activeRiskIndex` sin navegación.
-- `api/src/controllers/adminController.ts` → `getAlumnosEnRiesgo` — cuenta **solo** `estado='Ausente'`, ventana móvil de **45 días**, umbral plano `>=4`. **La ruta `/api/admin/riesgo` no está registrada** en `adminRoutes.ts` → 404.
+- `api/src/controllers/adminController.ts` → `getAlumnosEnRiesgo` — cuenta **solo** `estado='Ausente'`, ventana móvil de **45 días**, umbral plano `>=4`. La ruta `/api/admin/riesgo` está registrada directamente en `app.ts:49` (no en `adminRoutes.ts`), así que **devuelve datos con el conteo defectuoso** — el problema no es la ruta.
 - `src/components/layout/TopBar.tsx` — campana (`Bell`) con punto rojo **fijo**, sin contador ni dropdown.
 - `src/views/secretario/StudentsDirectory.tsx` — filtro "En Riesgo" y métrica "Alertas de Riesgo: 0" hardcodeados.
 
