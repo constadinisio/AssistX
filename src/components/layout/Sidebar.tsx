@@ -1,13 +1,14 @@
 import React from 'react';
-import { 
-  School, 
-  BarChart3, 
-  Users, 
-  ShieldCheck, 
-  Calendar as CalendarIcon, 
-  Settings, 
+import {
+  BarChart3,
+  Users,
+  ShieldCheck,
+  Calendar as CalendarIcon,
+  Settings,
   LogOut,
-  CheckSquare
+  CheckSquare,
+  GraduationCap,
+  FileCheck
 } from 'lucide-react';
 
 interface SidebarProps {
@@ -18,23 +19,28 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, userRole }) => {
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: BarChart3, roles: ['Secretario', 'Preceptor', 'Profesor EF'] },
-    { id: 'preceptor', label: userRole === 'Profesor EF' ? 'Clases & Prácticas' : 'Attendance Board', icon: CheckSquare, roles: ['Preceptor', 'Profesor EF'] },
-    { id: 'students', label: 'Student Management', icon: Users, roles: ['Secretario'] },
-    { id: 'users', label: 'User Roles', icon: ShieldCheck, roles: ['Secretario'] },
-    { id: 'calendar', label: 'Academic Calendar', icon: CalendarIcon, roles: ['Secretario', 'Preceptor', 'Profesor EF'] },
+    { id: 'dashboard', label: 'Panel de Control', icon: BarChart3, roles: ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
+    { id: 'preceptor', label: userRole === 'Profesor/a EF' ? 'Clases y Prácticas' : 'Registro de Asistencia', icon: CheckSquare, roles: ['Preceptor/a', 'Profesor/a EF'] },
+    { id: 'history', label: 'Historial por Alumno', icon: CalendarIcon, roles: ['Preceptor/a', 'Secretario/a'] },
+    { id: 'justificativos', label: 'Justificativos', icon: FileCheck, roles: ['Secretario/a', 'Preceptor/a'] },
+    { id: 'students', label: 'Gestión de Alumnos', icon: Users, roles: ['Secretario/a'] },
+    { id: 'courses', label: 'Gestión de Cursos', icon: GraduationCap, roles: ['Secretario/a'] },
+    { id: 'users', label: 'Roles de Usuario', icon: ShieldCheck, roles: ['Secretario/a'] },
+    { id: 'calendar', label: 'Calendario Académico', icon: CalendarIcon, roles: ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
   ].filter(item => item.roles.includes(userRole));
 
   return (
     <nav className="fixed left-0 top-0 h-full w-64 flex flex-col p-4 bg-white border-r border-slate-200 z-50">
       <div className="mb-8 px-4">
         <div className="flex items-center gap-2">
-          <div className="w-8 h-8 bg-brand-navy rounded-lg flex items-center justify-center text-white">
-            <School size={20} />
-          </div>
+          <img 
+            src="images/AssistX.png" 
+            alt="AssistX Logo" 
+            className="w-10 h-10 object-cover rounded-xl shadow-lg shadow-brand-navy/10 border border-slate-100" 
+          />
           <div>
             <h1 className="text-xl font-black text-brand-navy tracking-tighter leading-none">AssistX</h1>
-            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">{userRole} Portal</p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1"></p>
           </div>
         </div>
       </div>
@@ -43,7 +49,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, userR
         {menuItems.map((item) => (
           <button
             key={item.id}
-            onClick={() => setActiveTab(item.id)}
+            onClick={() => {
+              setActiveTab(item.id);
+              localStorage.setItem('activeTab', item.id);
+            }}
             className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all ${
               activeTab === item.id 
                 ? 'bg-slate-100 text-brand-navy font-semibold' 
@@ -57,14 +66,14 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, userR
       </div>
 
       <div className="border-t border-slate-100 pt-4 flex flex-col gap-1 text-slate-500">
-        <button className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 rounded-lg transition-colors text-sm">
-          <Settings size={18} /> Settings
-        </button>
         <button 
-          onClick={() => setActiveTab('login')}
+          onClick={() => {
+            localStorage.clear(); // Limpia todo (rol y posibles pestañas guardadas)
+            window.location.reload(); // Fuerza el reinicio limpio de la app
+          }}
           className="flex items-center gap-3 px-4 py-2 hover:bg-slate-50 rounded-lg transition-colors text-sm text-rose-600"
-        >
-          <LogOut size={18} /> Logout
+        > 
+          <LogOut size={18} /> Cerrar Sesión
         </button>
       </div>
     </nav>
