@@ -85,14 +85,15 @@ export async function generarNotificacionesRiesgo(alumnoIds: number[], fecha: st
 
 export const listarNotificaciones = async (_req: Request, res: Response) => {
   try {
-    const [rows] = await pool.query(
+    const [rows]: any = await pool.query(
       `SELECT n.id, n.id_alumno, a.nombre, a.apellido, n.tipo,
               n.faltas_snapshot AS faltas, n.mensaje, n.estado, n.leida, n.created_at
        FROM notificaciones n
        JOIN alumnos a ON a.id = n.id_alumno
        ORDER BY n.leida ASC, n.created_at DESC`
     );
-    res.json(rows);
+    // faltas_snapshot (DECIMAL) llega como string desde mysql2; lo normalizamos a número
+    res.json(rows.map((r: any) => ({ ...r, faltas: Number(r.faltas) })));
   } catch (error) {
     console.error('Error en listarNotificaciones:', error);
     res.status(500).json({ message: 'Error al listar notificaciones' });

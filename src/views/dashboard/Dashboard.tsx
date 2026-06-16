@@ -57,7 +57,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
         });
         if (response.ok) {
           const data = await response.json();
-          setRiskStudents(data);
+          // Mostrar solo alertas activas (no gestionadas) en el dashboard
+          setRiskStudents(Array.isArray(data) ? data.filter((n: any) => n.estado !== 'gestionada') : []);
         }
       } catch (error) {
         console.error('Error cargando notificaciones:', error);
