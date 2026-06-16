@@ -20,6 +20,7 @@ import asistenciaRoutes from './routes/asistenciaRoutes';
 import adminRoutes from './routes/adminRoutes';
 import reportRoutes from './routes/reportRoutes';
 import cursoRoutes from './routes/cursoRoutes';
+import notificacionRoutes from './routes/notificacionRoutes';
 
 const app = express();
 
@@ -44,6 +45,7 @@ app.use('/api/cursos', cursoRoutes);
 app.use('/api/asistencias', asistenciaRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reports', reportRoutes);
+app.use('/api/notificaciones', notificacionRoutes);
 // Debug de puerto y DB (solo para desarrollo)
 console.log(`🔧 Puerto configurado: ${process.env.PORT}`);
 console.log(`🔧 Host DB: ${process.env.DB_HOST}`);
