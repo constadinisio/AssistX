@@ -4,6 +4,7 @@ import {
   Users,
   ShieldCheck,
   Calendar as CalendarIcon,
+  CalendarRange,
   Settings,
   LogOut,
   CheckSquare,
@@ -25,6 +26,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, userR
     { id: 'justificativos', label: 'Justificativos', icon: FileCheck, roles: ['Secretario/a', 'Preceptor/a'] },
     { id: 'students', label: 'Gestión de Alumnos', icon: Users, roles: ['Secretario/a'] },
     { id: 'courses', label: 'Gestión de Cursos', icon: GraduationCap, roles: ['Secretario/a'] },
+    { id: 'periodos', label: 'Períodos / Bimestres', icon: CalendarRange, roles: ['Secretario/a'] },
     { id: 'users', label: 'Roles de Usuario', icon: ShieldCheck, roles: ['Secretario/a'] },
     { id: 'calendar', label: 'Calendario Académico', icon: CalendarIcon, roles: ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
   ].filter(item => item.roles.includes(userRole));

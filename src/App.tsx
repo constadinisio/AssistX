@@ -21,6 +21,7 @@ import { AcademicCalendar } from './views/calendar/AcademicCalendar';
 import { AttendanceBoard } from './views/preceptor/AttendanceBoard';
 import { StudentHistory } from './views/preceptor/StudentHistory';
 import { JustificativosPanel } from './views/justificativos/JustificativosPanel';
+import { PeriodManagement } from './views/secretario/PeriodManagement';
 
 export default function App() {
   // En lugar de empezar en null o "", debe intentar leer el localStorage de entrada
@@ -87,6 +88,9 @@ export default function App() {
               )}
               {activeTab === 'justificativos' && (userRole === 'Preceptor/a' || userRole === 'Secretario/a') && (
                 <JustificativosPanel key="just" />
+              )}
+              {activeTab === 'periodos' && userRole === 'Secretario/a' && (
+                <PeriodManagement key="per" />
               )}
             </AnimatePresence>
           </main>
