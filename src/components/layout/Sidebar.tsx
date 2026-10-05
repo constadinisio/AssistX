@@ -5,7 +5,6 @@ import {
   ShieldCheck,
   Calendar as CalendarIcon,
   CalendarRange,
-  Settings,
   LogOut,
   CheckSquare,
   GraduationCap,

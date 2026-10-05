@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
-import { Calendar as CalendarIcon, Plus, Trash2, ChevronLeft, ChevronRight, Info } from 'lucide-react';
+import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
 
 interface Evento {
   id: number;

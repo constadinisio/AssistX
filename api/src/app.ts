@@ -30,12 +30,6 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Logger para ver si las peticiones llegan al backend
-// Ruta raíz para verificar que el servidor funciona
-app.get('/', (req, res) => {
-    res.json({ message: '🚀 AssistX API está en línea', version: '1.0.0' });
-});
-
 // Ruta raíz para verificar que el servidor funciona
 app.get('/', (req, res) => {
     res.json({ message: '🚀 AssistX API está en línea', version: '1.0.0' });

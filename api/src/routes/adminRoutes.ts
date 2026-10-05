@@ -2,7 +2,6 @@ import { Router } from 'express';
 import {
     listarUsuarios,
     crearAlumno, 
-    obtenerAlumnosPorCurso, 
     listarTodosLosAlumnos, 
     crearUsuario,
     listarEventos,
@@ -31,6 +30,5 @@ router.patch('/usuarios/:id/aprobar', verifyToken, isAdmin, aprobarUsuario);
 router.patch('/usuarios/:id/rechazar', verifyToken, isAdmin, rechazarUsuario);
 router.get('/alumnos', verifyToken, isAdmin, listarTodosLosAlumnos);
 router.post('/alumnos', verifyToken, isAdmin, crearAlumno);
-router.get('/alumnos/curso/:id_curso', verifyToken, obtenerAlumnosPorCurso);
 
 export default router;

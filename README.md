@@ -41,7 +41,7 @@ AssistX permite a secretaría, preceptores y profesores de Educación Física re
 │       ├── middlewares/  # Autenticación / autorización (JWT)
 │       ├── config/       # Conexión a DB y configuración de subida de archivos
 │       └── utils/        # Lógica de riesgo (con unit tests)
-├── db/                   # Esquema y migraciones SQL
+├── db/                   # Volcados (esquema / con datos) y migraciones SQL
 │   └── migrations/
 ├── docs/                 # Especificaciones y planes de implementación
 └── images/               # Logos e imágenes
@@ -52,15 +52,18 @@ AssistX permite a secretaría, preceptores y profesores de Educación Física re
 **Requisitos:** Node.js 18+, MySQL o MariaDB.
 
 ### 1. Base de datos
-Creá la base e importá el esquema, luego aplicá las migraciones:
+Creá la base, importá **uno** de los dos volcados y después aplicá **siempre** las migraciones (ningún volcado las incluye):
+
+- `db/assistx_db_estructura.sql` — solo el esquema, sin datos.
+- `db/assistx_db_condatos.sql` — esquema + datos de prueba (cursos, alumnos, asistencias, eventos y usuarios).
+
 ```bash
 mysql -u root -e "CREATE DATABASE IF NOT EXISTS assistx_db;"
-mysql -u root assistx_db < db/assistx_db_estructura.sql
+mysql -u root assistx_db < db/assistx_db_condatos.sql   # o db/assistx_db_estructura.sql
 # Aplicar migraciones (en orden):
 mysql -u root assistx_db < db/migrations/2026-06-03_add_registro_fields.sql
 mysql -u root assistx_db < db/migrations/2026-06-15_notificaciones_justificativos.sql
 ```
-> Para datos de prueba podés usar `db/assistx_db_condatostest.sql` o el volcado completo `assistx_db.sql`.
 
 ### 2. Backend (`api/`)
 ```bash
@@ -89,7 +92,7 @@ El frontend no requiere variables de entorno: el proxy de Vite redirige `/api` a
 - `npm run dev` — servidor con recarga
 - `npm run build` — compila a `dist/`
 - `npm test` — unit tests de la lógica de riesgo (vitest)
-- `npm run seed` — carga datos de ejemplo
+- `npm run seed` — **borra** cursos, alumnos, asistencias y usuarios y carga datos de ejemplo (usuarios con clave `password123`)
 
 ## Documentación
 

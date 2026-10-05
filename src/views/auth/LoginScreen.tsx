@@ -4,8 +4,6 @@ import {
   BadgeCheck, 
   Lock, 
   Eye, 
-  ArrowRight, 
-  ShieldCheck,
   X
 } from 'lucide-react';
 
@@ -18,7 +16,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onGoToRegiste
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const [rememberMe, setRememberMe] = useState(false);
   const [showPass, setShowPass] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -31,8 +28,6 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onGoToRegiste
     try {
       // Usamos la ruta relativa para que pase por el proxy de Vite (puerto 5000)
       const backendUrl = '/api/auth/login';
-      
-      console.log("Intentando conectar con:", backendUrl);
 
       const response = await fetch(backendUrl, {
         method: 'POST',

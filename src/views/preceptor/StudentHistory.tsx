@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { motion } from 'motion/react';
-import { Search, Calendar, User, BookOpen, AlertCircle, ChevronRight, ArrowLeft } from 'lucide-react';
+import { Search, AlertCircle, ChevronRight, ArrowLeft } from 'lucide-react';
 
 export const StudentHistory: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
