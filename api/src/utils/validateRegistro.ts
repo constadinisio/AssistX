@@ -1,6 +1,9 @@
 // api/src/utils/validateRegistro.ts
 export const ROLES_VALIDOS = ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] as const;
 export type RolValido = typeof ROLES_VALIDOS[number];
+// El auto-registro público queda solo para quienes toman asistencia;
+// los Secretario/a los da de alta otro Secretario/a.
+export const ROLES_REGISTRO: readonly RolValido[] = ['Preceptor/a', 'Profesor/a EF'];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const CAMPOS_REQUERIDOS = ['nombre', 'apellido', 'dni', 'usuario', 'email', 'password', 'rol'] as const;
@@ -27,7 +30,7 @@ export function validateRegistro(body: unknown): string[] {
   if ((data.password as string).length < 8) {
     errores.push('La contraseña debe tener al menos 8 caracteres.');
   }
-  if (!ROLES_VALIDOS.includes(data.rol as RolValido)) {
+  if (!ROLES_REGISTRO.includes(data.rol as RolValido)) {
     errores.push('El rol seleccionado no es válido.');
   }
   return errores;

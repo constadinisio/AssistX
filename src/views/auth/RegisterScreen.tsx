@@ -5,7 +5,7 @@ interface RegisterScreenProps {
   onBackToLogin: () => void;
 }
 
-const ROLES = ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] as const;
+const ROLES = ['Preceptor/a', 'Profesor/a EF'] as const;
 
 export const RegisterScreen: React.FC<RegisterScreenProps> = ({ onBackToLogin }) => {
   const [form, setForm] = useState({
