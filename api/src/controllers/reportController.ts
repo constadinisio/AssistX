@@ -23,14 +23,14 @@ export const getAsistenciaPorRango = async (req: Request, res: Response) => {
 export const getMetricasDashboard = async (req: Request, res: Response) => {
     try {
         const [alumnos]: any = await pool.query('SELECT COUNT(*) as total FROM alumnos');
-        const [usuarios]: any = await pool.query('SELECT COUNT(*) as total FROM usuarios');
-        // Como no hay tabla de solicitudes aún, usamos 0 como valor real inicial
-        const solicitudesPendientes = 0; 
+        const [usuarios]: any = await pool.query(
+            `SELECT SUM(estado = 'Activo') as activos, SUM(estado = 'Pendiente') as pendientes FROM usuarios`
+        );
 
         res.json({
             totalAlumnos: alumnos[0].total,
-            personalActivo: usuarios[0].total,
-            solicitudesPendientes
+            personalActivo: Number(usuarios[0].activos ?? 0),
+            solicitudesPendientes: Number(usuarios[0].pendientes ?? 0)
         });
     } catch (error) {
         res.status(500).json({ message: 'Error al obtener métricas' });
@@ -40,7 +40,6 @@ export const getMetricasDashboard = async (req: Request, res: Response) => {
 export const getHistorialAlumno = async (req: Request, res: Response) => {
     const { alumnoId } = req.params;
     const searchPattern = `%${alumnoId}%`; 
-    console.log("Buscando alumno con patrón:", searchPattern); // Esto saldrá en la terminal de la API
     try {
         const [rows]: any = await pool.query(`
             SELECT 

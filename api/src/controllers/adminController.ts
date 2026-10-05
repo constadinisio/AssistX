@@ -42,17 +42,6 @@ export const crearAlumno = async (req: Request, res: Response) => {
     }
 };
 
-export const obtenerAlumnosPorCurso = async (req: Request, res: Response) => {
-    const { id_curso } = req.params;
-    try {
-        const [rows] = await pool.query('SELECT * FROM alumnos WHERE id_curso = ?', [id_curso]);
-        res.json(rows);
-    } catch (error) {
-        console.error("Error SQL en obtenerAlumnosPorCurso:", error);
-        res.status(500).json({ message: 'Error al obtener alumnos' });
-    }
-};
-
 export const listarTodosLosAlumnos = async (_req: Request, res: Response) => {
     try {
         const [rows] = await pool.query(`
@@ -73,7 +62,7 @@ export const crearUsuario = async (req: Request, res: Response) => {
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         await pool.query(
-            'INSERT INTO usuarios (nombre, apellido, usuario, password, rol) VALUES (?, ?, ?, ?, ?)',
+            "INSERT INTO usuarios (nombre, apellido, usuario, password, rol, estado) VALUES (?, ?, ?, ?, ?, 'Activo')",
             [nombre, apellido, usuario, hashedPassword, rol]
         );
         res.status(201).json({ message: 'Usuario del personal creado' });

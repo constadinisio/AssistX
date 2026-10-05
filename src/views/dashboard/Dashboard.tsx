@@ -2,11 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { 
   Users, 
-  TrendingUp, 
   BadgeCheck, 
   AlertTriangle, 
   ChevronRight, 
-  ChevronLeft,
   CheckSquare,
   Calendar as CalendarIcon,
   ShieldCheck
@@ -81,7 +79,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 gap-6 ${userRole === 'Secretario/a' ? 'md:grid-cols-3' : 'md:grid-cols-1'}`}>
+      <div className={`grid grid-cols-1 gap-6 ${userRole === 'Secretario/a' ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-1'}`}>
         {userRole === 'Secretario/a' && (
           <>
             <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all">
@@ -94,7 +92,35 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
                   <Users size={20} />
                 </div>
               </div>
-              <div className="mt-4 flex items-center gap-1 text-[11px] text-emerald-600 font-bold uppercase tracking-wider">
+            </div>
+
+            <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all">
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Personal Activo</p>
+                  <h3 className="text-3xl font-black text-brand-navy tracking-tight mt-2">{metrics.personalActivo}</h3>
+                </div>
+                <div className="p-3 bg-emerald-50 text-emerald-600 rounded-xl">
+                  <ShieldCheck size={20} />
+                </div>
+              </div>
+            </div>
+
+            <div
+              onClick={() => onNavigate('users')}
+              className={`bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all cursor-pointer ${metrics.solicitudesPendientes > 0 ? 'border-l-4 border-l-amber-500' : ''}`}
+            >
+              <div className="flex justify-between items-start">
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Solicitudes Pendientes</p>
+                  <h3 className="text-3xl font-black text-brand-navy tracking-tight mt-2">{metrics.solicitudesPendientes}</h3>
+                </div>
+                <div className={`p-3 rounded-xl ${metrics.solicitudesPendientes > 0 ? 'bg-amber-50 text-amber-600' : 'bg-slate-50 text-slate-300'}`}>
+                  <BadgeCheck size={20} />
+                </div>
+              </div>
+              <div className={`mt-4 text-[11px] font-black uppercase tracking-widest ${metrics.solicitudesPendientes > 0 ? 'text-amber-600' : 'text-slate-400'}`}>
+                {metrics.solicitudesPendientes > 0 ? 'Revisar solicitudes' : 'Sin solicitudes'}
               </div>
             </div>
           </>
@@ -103,8 +129,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
         <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all border-l-4 border-l-rose-500">
           <div className="flex justify-between items-start">
             <div>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Solicitudes Pendientes</p>
-              <h3 className="text-3xl font-black text-brand-navy tracking-tight mt-2">{metrics.solicitudesPendientes}</h3>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest leading-none mb-1">Alertas de Riesgo</p>
+              <h3 className="text-3xl font-black text-brand-navy tracking-tight mt-2">{riskStudents.length}</h3>
             </div>
             <button 
               onClick={() => riskStudents.length > 0 && setIsRiskModalOpen(true)}

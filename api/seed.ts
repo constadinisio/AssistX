@@ -27,15 +27,15 @@ async function seed() {
         const passwordHash = await bcrypt.hash('password123', 10);
         
         await connection.query(
-            'INSERT INTO usuarios (nombre, apellido, usuario, password, rol) VALUES (?, ?, ?, ?, ?)',
+            "INSERT INTO usuarios (nombre, apellido, usuario, password, rol, estado) VALUES (?, ?, ?, ?, ?, 'Activo')",
             ['Admin', 'Sistemas', 'admin', passwordHash, 'Secretario/a']
         );
         await connection.query(
-            'INSERT INTO usuarios (nombre, apellido, usuario, password, rol) VALUES (?, ?, ?, ?, ?)',
+            "INSERT INTO usuarios (nombre, apellido, usuario, password, rol, estado) VALUES (?, ?, ?, ?, ?, 'Activo')",
             ['Juan', 'Pérez', 'preceptor1', passwordHash, 'Preceptor/a']
         );
         await connection.query(
-            'INSERT INTO usuarios (nombre, apellido, usuario, password, rol) VALUES (?, ?, ?, ?, ?)',
+            "INSERT INTO usuarios (nombre, apellido, usuario, password, rol, estado) VALUES (?, ?, ?, ?, ?, 'Activo')",
             ['Marta', 'García', 'profe_ef', passwordHash, 'Profesor/a EF']
         );
 
