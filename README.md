@@ -15,6 +15,7 @@ AssistX permite a secretaría, preceptores y profesores de Educación Física re
 - **Calendario académico** e **historial de asistencia por alumno**.
 
 ### Roles
+- **Directivo/a** — todo lo de gestión del Secretario/a (sin toma de asistencia); es el único que puede dar de alta otros Directivo/a.
 - **Secretario/a** — administración completa (alumnos, cursos, usuarios, períodos, justificativos).
 - **Preceptor/a** — registro de asistencia, historial, justificativos.
 - **Profesor/a EF** — registro de asistencia de clases y grupos de Educación Física.

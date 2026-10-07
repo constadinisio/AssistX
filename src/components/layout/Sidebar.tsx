@@ -19,15 +19,15 @@ interface SidebarProps {
 
 export const Sidebar: React.FC<SidebarProps> = ({ activeTab, setActiveTab, userRole }) => {
   const menuItems = [
-    { id: 'dashboard', label: 'Panel de Control', icon: BarChart3, roles: ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
+    { id: 'dashboard', label: 'Panel de Control', icon: BarChart3, roles: ['Directivo/a', 'Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
     { id: 'preceptor', label: userRole === 'Profesor/a EF' ? 'Clases y Prácticas' : 'Registro de Asistencia', icon: CheckSquare, roles: ['Preceptor/a', 'Profesor/a EF'] },
-    { id: 'history', label: 'Historial por Alumno', icon: CalendarIcon, roles: ['Preceptor/a', 'Secretario/a'] },
-    { id: 'justificativos', label: 'Justificativos', icon: FileCheck, roles: ['Secretario/a', 'Preceptor/a'] },
-    { id: 'students', label: 'Gestión de Alumnos', icon: Users, roles: ['Secretario/a'] },
-    { id: 'courses', label: 'Gestión de Cursos', icon: GraduationCap, roles: ['Secretario/a'] },
-    { id: 'periodos', label: 'Períodos / Bimestres', icon: CalendarRange, roles: ['Secretario/a'] },
-    { id: 'users', label: 'Roles de Usuario', icon: ShieldCheck, roles: ['Secretario/a'] },
-    { id: 'calendar', label: 'Calendario Académico', icon: CalendarIcon, roles: ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
+    { id: 'history', label: 'Historial por Alumno', icon: CalendarIcon, roles: ['Preceptor/a', 'Directivo/a', 'Secretario/a'] },
+    { id: 'justificativos', label: 'Justificativos', icon: FileCheck, roles: ['Directivo/a', 'Secretario/a', 'Preceptor/a'] },
+    { id: 'students', label: 'Gestión de Alumnos', icon: Users, roles: ['Directivo/a', 'Secretario/a'] },
+    { id: 'courses', label: 'Gestión de Cursos', icon: GraduationCap, roles: ['Directivo/a', 'Secretario/a'] },
+    { id: 'periodos', label: 'Períodos / Bimestres', icon: CalendarRange, roles: ['Directivo/a', 'Secretario/a'] },
+    { id: 'users', label: 'Roles de Usuario', icon: ShieldCheck, roles: ['Directivo/a', 'Secretario/a'] },
+    { id: 'calendar', label: 'Calendario Académico', icon: CalendarIcon, roles: ['Directivo/a', 'Secretario/a', 'Preceptor/a', 'Profesor/a EF'] },
   ].filter(item => item.roles.includes(userRole));
 
   return (

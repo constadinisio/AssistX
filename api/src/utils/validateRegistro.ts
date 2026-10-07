@@ -1,8 +1,8 @@
 // api/src/utils/validateRegistro.ts
-export const ROLES_VALIDOS = ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'] as const;
+export const ROLES_VALIDOS = ['Directivo/a', 'Secretario/a', 'Preceptor/a', 'Profesor/a EF'] as const;
 export type RolValido = typeof ROLES_VALIDOS[number];
 // El auto-registro público queda solo para quienes toman asistencia;
-// los Secretario/a los da de alta otro Secretario/a.
+// los Secretario/a y Directivo/a se dan de alta desde Control de Usuario.
 export const ROLES_REGISTRO: readonly RolValido[] = ['Preceptor/a', 'Profesor/a EF'];
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;

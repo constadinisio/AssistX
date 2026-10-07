@@ -1,7 +1,19 @@
 import { Request, Response } from 'express';
 import pool from '../config/db';
 import bcrypt from 'bcrypt';
-import { ROLES_VALIDOS } from '../utils/validateRegistro';
+import { ROLES_VALIDOS, RolValido } from '../utils/validateRegistro';
+import { puedeAsignarRol } from '../utils/roles';
+
+// Devuelve el error HTTP correspondiente si el actor no puede asignar ese rol, o null si puede.
+const validarAsignacionRol = (actor: unknown, rol: unknown): { status: number; message: string } | null => {
+    if (!ROLES_VALIDOS.includes(rol as RolValido)) {
+        return { status: 400, message: 'El rol seleccionado no es válido.' };
+    }
+    if (!puedeAsignarRol(actor, rol)) {
+        return { status: 403, message: 'Solo un Directivo/a puede asignar el rol Directivo/a.' };
+    }
+    return null;
+};
 
 export const listarUsuarios = async (_req: Request, res: Response) => {
     try {
@@ -59,6 +71,8 @@ export const listarTodosLosAlumnos = async (_req: Request, res: Response) => {
 // --- GESTIÓN DE USUARIOS (PERSONAL) ---
 export const crearUsuario = async (req: Request, res: Response) => {
     const { nombre, apellido, usuario, password, rol } = req.body;
+    const errorRol = validarAsignacionRol((req as any).user?.rol, rol);
+    if (errorRol) return res.status(errorRol.status).json({ message: errorRol.message });
     try {
         const hashedPassword = await bcrypt.hash(password, 10);
         await pool.query(
@@ -128,8 +142,9 @@ export const aprobarUsuario = async (req: Request, res: Response) => {
     const { id } = req.params;
     const { rol } = req.body;
 
-    if (rol !== undefined && !ROLES_VALIDOS.includes(rol)) {
-        return res.status(400).json({ message: 'El rol seleccionado no es válido.' });
+    if (rol !== undefined) {
+        const errorRol = validarAsignacionRol((req as any).user?.rol, rol);
+        if (errorRol) return res.status(errorRol.status).json({ message: errorRol.message });
     }
 
     try {

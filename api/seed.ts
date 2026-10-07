@@ -25,7 +25,11 @@ async function seed() {
         // 2. Insertar Usuarios (Contraseña: password123)
         console.log('👤 Insertando usuarios...');
         const passwordHash = await bcrypt.hash('password123', 10);
-        
+
+        await connection.query(
+            "INSERT INTO usuarios (nombre, apellido, usuario, password, rol, estado) VALUES (?, ?, ?, ?, ?, 'Activo')",
+            ['Laura', 'Fernández', 'directivo', passwordHash, 'Directivo/a']
+        );
         await connection.query(
             "INSERT INTO usuarios (nombre, apellido, usuario, password, rol, estado) VALUES (?, ?, ?, ?, ?, 'Activo')",
             ['Admin', 'Sistemas', 'admin', passwordHash, 'Secretario/a']

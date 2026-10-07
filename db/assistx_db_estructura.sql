@@ -79,7 +79,7 @@ CREATE TABLE `usuarios` (
   `apellido` varchar(100) NOT NULL,
   `usuario` varchar(50) NOT NULL,
   `password` varchar(255) NOT NULL,
-  `rol` enum('Secretario/a','Preceptor/a','Profesor/a EF') NOT NULL,
+  `rol` enum('Directivo/a','Secretario/a','Preceptor/a','Profesor/a EF') NOT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 

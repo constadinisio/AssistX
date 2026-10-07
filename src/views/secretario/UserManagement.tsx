@@ -11,7 +11,15 @@ import {
   Clock
 } from 'lucide-react';
 
-export const UserManagement: React.FC = () => {
+interface UserManagementProps {
+  userRole: string;
+}
+
+const ROLES_PERSONAL = ['Secretario/a', 'Preceptor/a', 'Profesor/a EF'];
+
+export const UserManagement: React.FC<UserManagementProps> = ({ userRole }) => {
+  // Solo un Directivo/a puede asignar el rol Directivo/a (la API también lo valida).
+  const rolesAsignables = userRole === 'Directivo/a' ? ['Directivo/a', ...ROLES_PERSONAL] : ROLES_PERSONAL;
   const [searchQuery, setSearchQuery] = useState('');
   const [users, setUsers] = useState<any[]>([]);
   const [pendientes, setPendientes] = useState<any[]>([]);
@@ -168,9 +176,7 @@ export const UserManagement: React.FC = () => {
                       id={`rol-${p.id}`}
                       className="px-3 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none focus:ring-2 focus:ring-brand-navy/10"
                     >
-                      <option value="Secretario/a">Secretario/a</option>
-                      <option value="Preceptor/a">Preceptor/a</option>
-                      <option value="Profesor/a EF">Profesor/a EF</option>
+                      {rolesAsignables.map(r => <option key={r} value={r}>{r}</option>)}
                     </select>
                     <button
                       onClick={() => aprobar(p.id, (document.getElementById(`rol-${p.id}`) as HTMLSelectElement).value)}
@@ -309,9 +315,7 @@ export const UserManagement: React.FC = () => {
                   value={formData.rol}
                   onChange={e => setFormData({...formData, rol: e.target.value})}
                 >
-                  <option value="Secretario/a">Secretario/a</option>
-                  <option value="Preceptor/a">Preceptor/a</option>
-                  <option value="Profesor/a EF">Profesor/a EF</option>
+                  {rolesAsignables.map(r => <option key={r} value={r}>{r}</option>)}
                 </select>
               </div>
               <button 

@@ -214,6 +214,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onGoToRegiste
                 <p className="mb-4">Cada usuario únicamente podrá acceder a las funciones correspondientes a su perfil institucional.</p>
                 <p className="mb-4">Los principales roles del sistema incluyen:</p>
                 <ul className="list-disc list-inside mb-4 space-y-2 text-slate-700">
+                  <li>Dirección.</li>
                   <li>Secretaría / Administración.</li>
                   <li>Preceptoría.</li>
                   <li>Profesores de Educación Física.</li>

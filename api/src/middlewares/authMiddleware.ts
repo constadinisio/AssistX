@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
+import { esRolGestion } from '../utils/roles';
 
 export const verifyToken = (req: Request, res: Response, next: NextFunction) => {
     const token = req.header('Authorization')?.split(' ')[1];
@@ -15,11 +16,11 @@ export const verifyToken = (req: Request, res: Response, next: NextFunction) => 
     }
 };
 
-// Middleware para restringir por rol (ej. solo puede crear alumnos)
+// Middleware para restringir a roles de gestión (Secretario/a y Directivo/a)
 export const isAdmin = (req: Request, res: Response, next: NextFunction) => {
     const user = (req as any).user;
-    if (user.rol !== 'Secretario/a') {
-        return res.status(403).json({ message: 'Requiere rol de Secretario.' });
+    if (!esRolGestion(user?.rol)) {
+        return res.status(403).json({ message: 'Requiere rol de Secretario o Directivo.' });
     }
     next();
 };

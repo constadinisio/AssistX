@@ -22,6 +22,7 @@ import { AttendanceBoard } from './views/preceptor/AttendanceBoard';
 import { StudentHistory } from './views/preceptor/StudentHistory';
 import { JustificativosPanel } from './views/justificativos/JustificativosPanel';
 import { PeriodManagement } from './views/secretario/PeriodManagement';
+import { isGestion } from './utils/roles';
 
 export default function App() {
   // En lugar de empezar en null o "", debe intentar leer el localStorage de entrada
@@ -61,20 +62,20 @@ export default function App() {
               {activeTab === 'dashboard' && (
                 <Dashboard key="dash" userRole={userRole as string} onNavigate={setActiveTab} />
               )}
-              {activeTab === 'users' && userRole === 'Secretario/a' && (
-                <UserManagement key="users" />
+              {activeTab === 'users' && isGestion(userRole) && (
+                <UserManagement key="users" userRole={userRole} />
               )}
               {activeTab === 'calendar' && (
                 <AcademicCalendar key="cal" userRole={userRole as string} />
               )}
-              {activeTab === 'students' && userRole === 'Secretario/a' && (
+              {activeTab === 'students' && isGestion(userRole) && (
                 <StudentsDirectory 
                   key="stu" 
                   cursoIdInicial={cursoFilterId} 
                   onClearFilter={() => setCursoFilterId(null)} 
                 />
               )}
-              {activeTab === 'courses' && userRole === 'Secretario/a' && (
+              {activeTab === 'courses' && isGestion(userRole) && (
                 <CourseManagement key="courses" onViewStudents={(id) => {
                   setCursoFilterId(id);
                   setActiveTab('students');
@@ -83,13 +84,13 @@ export default function App() {
               {activeTab === 'preceptor' && (userRole === 'Preceptor/a' || userRole === 'Profesor/a EF') && (
                 <AttendanceBoard key="pre" userRole={userRole as string} />
               )}
-              {activeTab === 'history' && (userRole === 'Preceptor/a' || userRole === 'Secretario/a') && (
+              {activeTab === 'history' && (userRole === 'Preceptor/a' || isGestion(userRole)) && (
                 <StudentHistory key="hist" />
               )}
-              {activeTab === 'justificativos' && (userRole === 'Preceptor/a' || userRole === 'Secretario/a') && (
+              {activeTab === 'justificativos' && (userRole === 'Preceptor/a' || isGestion(userRole)) && (
                 <JustificativosPanel key="just" />
               )}
-              {activeTab === 'periodos' && userRole === 'Secretario/a' && (
+              {activeTab === 'periodos' && isGestion(userRole) && (
                 <PeriodManagement key="per" />
               )}
             </AnimatePresence>

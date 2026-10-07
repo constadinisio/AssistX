@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'motion/react';
 import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
+import { isGestion } from '../../utils/roles';
 
 interface Evento {
   id: number;
@@ -15,7 +16,7 @@ export const AcademicCalendar: React.FC<{ userRole: string }> = ({ userRole }) =
   const [viewDate, setViewDate] = useState(new Date());
   const [showModal, setShowModal] = useState(false);
   const [nuevoEvento, setNuevoEvento] = useState({ titulo: '', fecha: '', tipo: 'Evento', descripcion: '' });
-  const isAdmin = userRole === 'Secretario/a';
+  const isAdmin = isGestion(userRole);
 
   // Lógica para la grilla
   const daysInMonth = (y: number, m: number) => new Date(y, m + 1, 0).getDate();

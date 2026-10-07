@@ -10,6 +10,7 @@ import {
   ShieldCheck
 } from 'lucide-react';
 import { RiskNotificationModal } from '../../components/layout/RiskNotificationModal';
+import { isGestion } from '../../utils/roles';
 
 interface DashboardProps {
   userRole: string;
@@ -79,8 +80,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
         </div>
       </div>
 
-      <div className={`grid grid-cols-1 gap-6 ${userRole === 'Secretario/a' ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-1'}`}>
-        {userRole === 'Secretario/a' && (
+      <div className={`grid grid-cols-1 gap-6 ${isGestion(userRole) ? 'md:grid-cols-2 xl:grid-cols-4' : 'md:grid-cols-1'}`}>
+        {isGestion(userRole) && (
           <>
             <div className="bg-white border border-slate-200 p-6 rounded-2xl shadow-sm hover:shadow-md transition-all">
               <div className="flex justify-between items-start">
@@ -151,7 +152,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
         <div className="lg:col-span-8 space-y-6">
           <h2 className="text-xl font-bold text-brand-navy">Módulos de Acceso Rápido</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {userRole === 'Secretario/a' ? (
+            {isGestion(userRole) ? (
               <>
                 <div 
                   onClick={() => onNavigate('students')}
