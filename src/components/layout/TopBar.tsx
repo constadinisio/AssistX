@@ -74,7 +74,7 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
   return (
     <header className="sticky top-0 z-40 flex justify-between items-center px-8 py-3 bg-white/80 backdrop-blur-md border-b border-slate-200 ml-64">
       <div className="flex items-center gap-4 flex-grow">
-        <img src="/images/EncabezadoET20.webp" alt="Encabezado-ET20" className="h-11 w-auto object-contain opacity-90" />
+        <img src="/images/Encabezado-et20.jpg" alt="Encabezado-ET20" className="h-11 w-auto object-contain opacity-90" />
       </div>
 
       <div className="flex items-center gap-4">
@@ -134,13 +134,6 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
             <p className="text-[10px] text-slate-500 font-medium mt-1">
               {userRole === 'Secretario/a' ? 'Secretaría Institucional' : userRole === 'Preceptor/a' ? 'Preceptor de Turno' : 'Departamento de Ed. Física'}
             </p>
-          </div>
-          <div className="h-10 w-10 rounded-full border border-slate-200 overflow-hidden shadow-sm">
-            <img src={
-              userRole === 'Secretario/a' ? 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&q=80&w=100' :
-              userRole === 'Preceptor/a' ? 'https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=100' :
-              'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=100'
-            } alt="Perfil" />
           </div>
         </div>
       </div>
