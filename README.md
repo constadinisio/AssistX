@@ -64,12 +64,17 @@ mysql -u root assistx_db < db/assistx_db_condatos.sql   # o db/assistx_db_estruc
 # Aplicar migraciones (en orden):
 mysql -u root assistx_db < db/migrations/2026-06-03_add_registro_fields.sql
 mysql -u root assistx_db < db/migrations/2026-06-15_notificaciones_justificativos.sql
+mysql -u root assistx_db < db/migrations/2026-10-07_add_rol_directivo.sql
+# ATENCION: la siguiente migracion no se puede volver a ejecutar y su DDL hace
+# autocommit (no es transaccional). Hacé un backup antes:
+#   mariadb-dump -u root assistx_db > backup.sql
+mysql -u root assistx_db < db/migrations/2026-10-14_notificaciones_por_usuario.sql
 ```
 
 ### 2. Backend (`api/`)
 ```bash
 cd api
-cp .env.example .env      # completá DB_PASSWORD y un JWT_SECRET propio
+cp .env.example .env      # completá DB_PASSWORD y un JWT_SECRET propio (DB_PORT es opcional, por defecto 3306)
 npm install
 npm run dev               # API en http://127.0.0.1:5000
 ```
@@ -93,6 +98,7 @@ El frontend no requiere variables de entorno: el proxy de Vite redirige `/api` a
 - `npm run dev` — servidor con recarga
 - `npm run build` — compila a `dist/`
 - `npm test` — unit tests de la lógica de riesgo (vitest)
+- `npm run test:int` — tests de integración (vitest + supertest). Necesita una MariaDB accesible con las credenciales de `api/.env` y **borra y recrea** las bases `assistx_test` y `assistx_test_mig` (nunca toca `assistx_db`)
 - `npm run seed` — **borra** cursos, alumnos, asistencias y usuarios y carga datos de ejemplo (usuarios con clave `password123`)
 
 ## Documentación
