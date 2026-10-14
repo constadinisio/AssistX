@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { esRolGestion, puedeAsignarRol } from './roles';
+import { esRolGestion, puedeAsignarRol, esRolDeRiesgo, ROLES_RIESGO } from './roles';
 
 describe('esRolGestion', () => {
   it('Secretario/a es de gestión', () => expect(esRolGestion('Secretario/a')).toBe(true));
@@ -25,4 +25,13 @@ describe('puedeAsignarRol', () => {
     expect(puedeAsignarRol('Preceptor/a', 'Preceptor/a')).toBe(false));
   it('rol destino inválido se rechaza', () =>
     expect(puedeAsignarRol('Directivo/a', 'Hacker')).toBe(false));
+});
+
+describe('esRolDeRiesgo', () => {
+  it('Preceptor/a recibe alertas de riesgo', () => expect(esRolDeRiesgo('Preceptor/a')).toBe(true));
+  it('Secretario/a recibe alertas de riesgo', () => expect(esRolDeRiesgo('Secretario/a')).toBe(true));
+  it('Directivo/a recibe alertas de riesgo', () => expect(esRolDeRiesgo('Directivo/a')).toBe(true));
+  it('Profesor/a EF no recibe alertas de riesgo', () => expect(esRolDeRiesgo('Profesor/a EF')).toBe(false));
+  it('undefined no recibe alertas de riesgo', () => expect(esRolDeRiesgo(undefined)).toBe(false));
+  it('ROLES_RIESGO no incluye a Profesor/a EF', () => expect(ROLES_RIESGO).not.toContain('Profesor/a EF'));
 });

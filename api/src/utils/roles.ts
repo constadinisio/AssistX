@@ -8,6 +8,13 @@ export function esRolGestion(rol: unknown): boolean {
   return ROLES_GESTION.includes(rol as RolValido);
 }
 
+// Roles que reciben las alertas de riesgo de asistencia (bandeja por usuario).
+export const ROLES_RIESGO: readonly RolValido[] = ['Preceptor/a', 'Secretario/a', 'Directivo/a'];
+
+export function esRolDeRiesgo(rol: unknown): boolean {
+  return typeof rol === 'string' && (ROLES_RIESGO as readonly string[]).includes(rol);
+}
+
 /**
  * Indica si un usuario con rol `actor` puede asignar el rol `destino` a otro usuario.
  * Solo los roles de gestión asignan roles, y solo un Directivo/a puede crear otro Directivo/a.
