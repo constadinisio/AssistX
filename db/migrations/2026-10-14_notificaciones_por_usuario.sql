@@ -23,6 +23,7 @@ ALTER TABLE `notificaciones`
 
 -- Hasta hoy todas las notificaciones son de riesgo de asistencia.
 UPDATE `notificaciones` SET `roles_destino` = 'Preceptor/a,Secretario/a,Directivo/a';
+ALTER TABLE `notificaciones` ALTER COLUMN `roles_destino` DROP DEFAULT;
 
 -- Las que estaban leídas (global) quedan leídas para cada usuario activo de esos roles.
 INSERT IGNORE INTO `notificacion_lecturas` (`id_notificacion`, `id_usuario`)

@@ -126,7 +126,7 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
                 <span className="font-black text-brand-navy text-sm uppercase tracking-tight">Notificaciones</span>
                 {noLeidas > 0 && (
                   <button onClick={marcarTodas} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600">
-                    <CheckCheck size={12} /> Marcar todas
+                    <CheckCheck size={12} /> Marcar todas como leídas
                   </button>
                 )}
               </div>

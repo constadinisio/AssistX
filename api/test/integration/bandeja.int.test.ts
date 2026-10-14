@@ -89,6 +89,8 @@ describe('bandeja de notificaciones por usuario', () => {
     expect(deA.map((n: any) => [n.id, n.leida]).sort()).toEqual([[a, 1], [b, 1]].sort());
     const deSecretaria = (await listar(secretaria.token)).body;
     expect(deSecretaria.every((n: any) => n.leida === 0)).toBe(true);
+    const deB = (await listar(preceptorB.token)).body;
+    expect(deB.map((n: any) => [n.id, n.leida]).sort()).toEqual([[a, 0], [b, 0]].sort());
   });
 
   it('las no leídas aparecen primero', async () => {

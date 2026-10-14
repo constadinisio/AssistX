@@ -53,6 +53,12 @@ describe('migración 2026-10-14 notificaciones por usuario', () => {
     expect(rows.map((r: any) => r.roles_destino)).toEqual([ROLES_RIESGO_CSV]);
   });
 
+  it('roles_destino queda NOT NULL y sin valor por defecto', async () => {
+    const [cols]: any = await conn.query("SHOW COLUMNS FROM notificaciones LIKE 'roles_destino'");
+    expect(cols[0].Null).toBe('NO');
+    expect(cols[0].Default).toBeNull();
+  });
+
   it('las leídas quedan leídas para cada usuario activo de esos roles, y solo para ellos', async () => {
     const [esperados]: any = await conn.query(
       "SELECT id FROM usuarios WHERE estado = 'Activo' AND rol IN ('Preceptor/a','Secretario/a','Directivo/a') ORDER BY id"
