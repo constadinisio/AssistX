@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
 import pool from '../config/db';
+import { esRolDeRiesgo } from '../utils/roles';
 import { generarNotificacionesRiesgo } from './notificacionController';
 
 export const registrarAsistencia = async (req: Request, res: Response) => {
@@ -34,7 +35,12 @@ export const registrarAsistencia = async (req: Request, res: Response) => {
             console.error('Error generando notificaciones de riesgo:', notifError);
         }
 
-        res.status(201).json({ message: 'Asistencia registrada correctamente', alertas });
+        // Las notificaciones se crean igual; el pop-up solo lo ven quienes pueden gestionarlas.
+        const rol = (req as any).user?.rol;
+        res.status(201).json({
+            message: 'Asistencia registrada correctamente',
+            alertas: esRolDeRiesgo(rol) ? alertas : [],
+        });
     } catch (error) {
         console.error("❌ Error en registrarAsistencia:", error);
         await connection.rollback();

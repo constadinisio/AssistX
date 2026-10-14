@@ -1,5 +1,7 @@
 import { Request, Response } from 'express';
 import pool from '../config/db';
+import { crearNotificacion } from '../utils/notificacionesData';
+import { ROLES_RIESGO } from '../utils/roles';
 import { evaluarRiesgo } from '../utils/riesgoData';
 
 export interface AlertaRiesgo {
@@ -40,11 +42,15 @@ async function crearNotificacionSiNoExiste(
   const nombreCompleto = `${alumno.apellido}, ${alumno.nombre}`;
   const mensaje = construirMensaje(tipo, snapshot, nombreCompleto);
 
-  const [result]: any = await pool.query(
-    `INSERT INTO notificaciones (id_alumno, tipo, faltas_snapshot, id_periodo, anio, mensaje)
-     VALUES (?, ?, ?, ?, ?, ?)`,
-    [idAlumno, tipo, snapshot, idPeriodo, anio, mensaje]
-  );
+  const idNotificacion = await crearNotificacion({
+    tipo,
+    mensaje,
+    roles_destino: ROLES_RIESGO,
+    id_alumno: idAlumno,
+    faltas_snapshot: snapshot,
+    id_periodo: idPeriodo,
+    anio,
+  });
 
   return {
     id_alumno: idAlumno,
@@ -53,7 +59,7 @@ async function crearNotificacionSiNoExiste(
     tipo,
     faltas: snapshot,
     mensaje,
-    id_notificacion: result.insertId,
+    id_notificacion: idNotificacion,
   };
 }
 
