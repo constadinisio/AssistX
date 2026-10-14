@@ -7,6 +7,7 @@ import {
 } from 'lucide-react';
 import { AttendanceStatus } from '../../types';
 import { RiskNotificationModal } from '../../components/layout/RiskNotificationModal';
+import { enviarAviso, textoGestion } from '../../services/notificaciones';
 
 interface AttendanceBoardProps {
   userRole: string;
@@ -207,14 +208,13 @@ export const AttendanceBoard: React.FC<AttendanceBoardProps> = ({ userRole }) =>
 
   const enviarAvisoAlerta = async () => {
     if (!alertaActual) return;
-    try {
-      await fetch('/api/intervenciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
-        body: JSON.stringify({ id_alumno: alertaActual.id_alumno, id_notificacion: alertaActual.id_notificacion, motivo: 'Aviso a la familia por riesgo de asistencias' }),
-      });
-    } catch (e) {
-      console.error('Error enviando aviso:', e);
+    const r = await enviarAviso({ id_alumno: alertaActual.id_alumno, id_notificacion: alertaActual.id_notificacion });
+    if ('message' in r) {
+      alert(r.message);
+      return;
+    }
+    if ('gestionada_at' in r) {
+      alert(`${textoGestion(r)}. No se registró un aviso duplicado.`);
     }
     cerrarAlerta();
   };

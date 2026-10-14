@@ -1,20 +1,16 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Bell, AlertTriangle, Send, Check } from 'lucide-react';
+import { Bell, AlertTriangle, Send, Check, CheckCheck } from 'lucide-react';
+import {
+  Notificacion,
+  listarNotificaciones,
+  marcarLeida as marcarLeidaApi,
+  marcarTodasLeidas,
+  enviarAviso as enviarAvisoApi,
+  textoGestion,
+} from '../../services/notificaciones';
 
 interface TopBarProps {
   userRole: string;
-}
-
-interface Notificacion {
-  id: number;
-  id_alumno: number;
-  nombre: string;
-  apellido: string;
-  tipo: 'Riesgo' | 'Critico' | 'RegularidadAnual';
-  faltas: number;
-  mensaje: string;
-  estado: 'nueva' | 'gestionada';
-  leida: number;
 }
 
 interface PerfilDemo {
@@ -46,14 +42,12 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
   const perfil = PERFILES[userRole] ?? PERFIL_EF;
   const [open, setOpen] = useState(false);
   const [notifs, setNotifs] = useState<Notificacion[]>([]);
+  const [error, setError] = useState<string | null>(null);
   const ref = useRef<HTMLDivElement>(null);
-
-  const token = () => localStorage.getItem('token');
 
   const fetchNotifs = async () => {
     try {
-      const res = await fetch('/api/notificaciones', { headers: { Authorization: `Bearer ${token()}` } });
-      if (res.ok) setNotifs(await res.json());
+      setNotifs(await listarNotificaciones());
     } catch (e) {
       console.error('Error cargando notificaciones:', e);
     }
@@ -76,25 +70,37 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
   const noLeidas = notifs.filter(n => n.leida === 0).length;
 
   const marcarLeida = async (id: number) => {
+    setError(null);
     try {
-      await fetch(`/api/notificaciones/${id}/leida`, { method: 'PATCH', headers: { Authorization: `Bearer ${token()}` } });
+      await marcarLeidaApi(id);
       setNotifs(prev => prev.map(n => (n.id === id ? { ...n, leida: 1 } : n)));
     } catch (e) {
       console.error('Error marcando leída:', e);
+      setError('No se pudo marcar la notificación como leída.');
+    }
+  };
+
+  const marcarTodas = async () => {
+    setError(null);
+    try {
+      await marcarTodasLeidas();
+      setNotifs(prev => prev.map(n => ({ ...n, leida: 1 })));
+    } catch (e) {
+      console.error('Error marcando todas como leídas:', e);
+      setError('No se pudieron marcar las notificaciones como leídas.');
     }
   };
 
   const enviarAviso = async (n: Notificacion) => {
-    try {
-      await fetch('/api/intervenciones', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token()}` },
-        body: JSON.stringify({ id_alumno: n.id_alumno, id_notificacion: n.id, motivo: 'Aviso a la familia por riesgo de asistencias' }),
-      });
-      setNotifs(prev => prev.map(x => (x.id === n.id ? { ...x, estado: 'gestionada' } : x)));
-    } catch (e) {
-      console.error('Error enviando aviso:', e);
+    if (n.id_alumno === null) return;
+    setError(null);
+    const r = await enviarAvisoApi({ id_alumno: n.id_alumno, id_notificacion: n.id });
+    if ('message' in r) {
+      setError(r.message);
+      return;
     }
+    // Éxito o ya gestionada por otra persona: recargar para mostrar quién y cuándo.
+    await fetchNotifs();
   };
 
   return (
@@ -116,9 +122,17 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
 
           {open && (
             <div className="absolute right-0 mt-2 w-96 max-h-[480px] overflow-y-auto bg-white border border-slate-200 rounded-2xl shadow-xl z-50">
-              <div className="p-4 border-b border-slate-100 font-black text-brand-navy text-sm uppercase tracking-tight">
-                Notificaciones de Riesgo
+              <div className="p-4 border-b border-slate-100 flex items-center justify-between">
+                <span className="font-black text-brand-navy text-sm uppercase tracking-tight">Notificaciones</span>
+                {noLeidas > 0 && (
+                  <button onClick={marcarTodas} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600">
+                    <CheckCheck size={12} /> Marcar todas
+                  </button>
+                )}
               </div>
+              {error && (
+                <p className="px-4 py-2 text-[11px] font-medium text-rose-600 bg-rose-50 border-b border-rose-100">{error}</p>
+              )}
               {notifs.length === 0 ? (
                 <p className="p-6 text-center text-slate-400 text-sm font-medium">No hay notificaciones.</p>
               ) : (
@@ -130,11 +144,13 @@ export const TopBar: React.FC<TopBarProps> = ({ userRole }) => {
                         <p className="text-xs text-slate-700 font-medium leading-relaxed">{n.mensaje}</p>
                         <div className="flex gap-2 mt-2">
                           {n.estado !== 'gestionada' ? (
-                            <button onClick={() => enviarAviso(n)} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-brand-navy hover:underline">
-                              <Send size={12} /> Enviar Aviso
-                            </button>
+                            n.id_alumno !== null && (
+                              <button onClick={() => enviarAviso(n)} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-brand-navy hover:underline">
+                                <Send size={12} /> Enviar Aviso
+                              </button>
+                            )
                           ) : (
-                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">Gestionada</span>
+                            <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">{textoGestion(n)}</span>
                           )}
                           {n.leida === 0 && (
                             <button onClick={() => marcarLeida(n.id)} className="flex items-center gap-1 text-[10px] font-black uppercase tracking-widest text-slate-400 hover:text-slate-600">

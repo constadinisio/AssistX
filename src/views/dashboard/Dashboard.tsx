@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import { RiskNotificationModal } from '../../components/layout/RiskNotificationModal';
 import { isGestion } from '../../utils/roles';
+import { Notificacion, listarNotificaciones, enviarAviso, textoGestion } from '../../services/notificaciones';
 
 interface DashboardProps {
   userRole: string;
@@ -26,7 +27,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
 
   // Estados para el sistema de notificaciones de riesgo
   const [isRiskModalOpen, setIsRiskModalOpen] = useState(false);
-  const [riskStudents, setRiskStudents] = useState<any[]>([]);
+  const [riskStudents, setRiskStudents] = useState<Notificacion[]>([]);
   const [activeRiskIndex, setActiveRiskIndex] = useState(0);
 
   useEffect(() => {
@@ -51,14 +52,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
   useEffect(() => {
     const fetchNotifs = async () => {
       try {
-        const response = await fetch('/api/notificaciones', {
-          headers: { Authorization: `Bearer ${localStorage.getItem('token')}` },
-        });
-        if (response.ok) {
-          const data = await response.json();
-          // Mostrar solo alertas activas (no gestionadas) en el dashboard
-          setRiskStudents(Array.isArray(data) ? data.filter((n: any) => n.estado !== 'gestionada') : []);
-        }
+        const data = await listarNotificaciones();
+        // Mostrar solo alertas activas (no gestionadas) en el dashboard
+        setRiskStudents(data.filter(n => n.estado !== 'gestionada'));
       } catch (error) {
         console.error('Error cargando notificaciones:', error);
       }
@@ -277,17 +273,20 @@ export const Dashboard: React.FC<DashboardProps> = ({ userRole, onNavigate }) =>
         onViewDetails={() => { setIsRiskModalOpen(false); onNavigate('history'); }}
         onSendAviso={async () => {
           const n = riskStudents[activeRiskIndex];
-          if (n) {
-            try {
-              await fetch('/api/intervenciones', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${localStorage.getItem('token')}` },
-                body: JSON.stringify({ id_alumno: n.id_alumno, id_notificacion: n.id, motivo: 'Aviso a la familia por riesgo de asistencias' }),
-              });
-            } catch (e) {
-              console.error('Error enviando aviso:', e);
-            }
+          if (!n || n.id_alumno === null) {
+            setIsRiskModalOpen(false);
+            return;
           }
+          const r = await enviarAviso({ id_alumno: n.id_alumno, id_notificacion: n.id });
+          if ('message' in r) {
+            alert(r.message);
+            return;
+          }
+          if ('gestionada_at' in r) {
+            alert(`${textoGestion(r)}. No se registró un aviso duplicado.`);
+          }
+          setRiskStudents(prev => prev.filter(x => x.id !== n.id));
+          setActiveRiskIndex(0);
           setIsRiskModalOpen(false);
         }}
       />
