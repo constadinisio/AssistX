@@ -93,7 +93,9 @@ Mismos endpoints, todos con `verifyToken`. El rol y el id del usuario salen de `
 - **`api/src/utils/notificaciones.ts` (nuevo):**
   - `TIPOS_NOTIFICACION` (constante; hoy `Riesgo`, `Critico`, `RegularidadAnual`).
   - `esTipoValido(tipo)`, `parsearRolesDestino(csv)`, `esDestinatario(rol, rolesDestino)` — funciones puras.
+- **`api/src/utils/notificacionesData.ts` (nuevo):** acceso a datos, separado de la lógica pura igual que `riesgo.ts` / `riesgoData.ts`.
   - `crearNotificacion({ tipo, mensaje, roles_destino, id_alumno?, faltas_snapshot?, id_periodo?, anio? })` — único punto de inserción; valida tipo y roles contra `ROLES_VALIDOS` (de `utils/validateRegistro.ts`).
+  - `buscarNotificacionDeRol(conn, id, rol, bloquear?)` — devuelve la notificación solo si está dirigida al rol (404 si no).
 - **`api/src/utils/roles.ts`:** agrega `ROLES_RIESGO: readonly RolValido[] = ['Preceptor/a', 'Secretario/a', 'Directivo/a']`, con el mismo patrón que `ROLES_GESTION`.
 - **`notificacionController.ts`:** `generarNotificacionesRiesgo` usa `crearNotificacion` con `ROLES_RIESGO`; dedup y respuesta para el pop-up sin cambios. `listarNotificaciones`, `marcarLeida` y el nuevo `marcarTodasLeidas` aplican el filtro por rol/usuario.
 - **`intervencionController.ts`:** validación de destinatario, 409 y `gestionada_por`/`gestionada_at`.
